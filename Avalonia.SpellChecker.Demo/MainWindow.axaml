@@ -2,13 +2,16 @@
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-		mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="450"
+		mc:Ignorable="d" d:DesignWidth="600" d:DesignHeight="550"
 		xmlns:local="clr-namespace:Avalonia.SpellChecker.Demo"
 		x:Class="Avalonia.SpellChecker.Demo.MainWindow"
 		Title="Avalonia Spell Checker Demo">
 	<StackPanel Margin="20">
-		<TextBlock Margin="0 5" >Name:</TextBlock>
+		<CheckBox x:Name="cbGlobalSpellCheckingEnable" Content="Global spell checking enabled" IsChecked="true" />
+
+		<TextBlock Margin="0 15" >Name:</TextBlock>
 		<TextBox x:Name="tbUserName" Watermark="Enter your name" Cursor="Arrow" />
+		<CheckBox x:Name="cbUserNameSpellCheckingEnable" Content="Spell checking enabled" IsChecked="true" HorizontalAlignment="Right" />
 
 		<TextBlock Margin="0 5" >Name (without spell checking):</TextBlock>
 		<TextBox x:Name="tbUserName2" Watermark="Enter your name" Cursor="Arrow" />
@@ -16,8 +19,9 @@
 		<TextBlock Margin="0 15 0 5">Notes:</TextBlock>
 		<TextBox x:Name="tbNotes" Height="100" 
 				 TextWrapping="Wrap" VerticalAlignment="Top" AcceptsReturn="True" />
+		<CheckBox x:Name="cbNotesSpellCheckingEnable" Content="Spell checking enabled" IsChecked="true" HorizontalAlignment="Right" />
 
-		<TextBlock Margin="0 15 0 5">Notes (without spell checking):</TextBlock>
+		<TextBlock Margin="0 5 0 5">Notes (without spell checking):</TextBlock>
 		<TextBox x:Name="tbNotes2" Height="100" TextWrapping="Wrap" VerticalAlignment="Top" AcceptsReturn="True" />
 	</StackPanel>
 </Window>
