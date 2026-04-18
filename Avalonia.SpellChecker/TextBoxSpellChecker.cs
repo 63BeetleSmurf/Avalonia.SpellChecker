@@ -16,14 +16,35 @@ namespace Avalonia.SpellChecker
     public class TextBoxSpellChecker
     {
         private readonly HashSet<TextBox> controls = new HashSet<TextBox>();
+        private readonly HashSet<TextBox> disabledControls = new HashSet<TextBox>();
         private readonly SpellCheckerConfig config;
 
         public TextBoxSpellChecker(SpellCheckerConfig config)
         {
             this.config = config;
+            _isEnabled = this.config.IsEnabled;
         }
 
-        public void Initialize(TextBox textBox)
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set
+            {
+                if (_isEnabled == value)
+                {
+                    return;
+                }
+
+                _isEnabled = value;
+                foreach (var textBox in controls.Where(tb => !disabledControls.Contains(tb)))
+                {
+                    SetPresenterEnabled(textBox, value);
+                }
+            }
+        }
+        private bool _isEnabled;
+
+        public void Initialize(TextBox textBox, bool isEnabled = true)
         {
 
             if (config is null)
@@ -38,6 +59,8 @@ namespace Avalonia.SpellChecker
             }
 
             controls.Add(textBox);
+            if (!isEnabled)
+                disabledControls.Add(textBox);
 
             // Create a new StyleInclude instance
             var styleInclude = new StyleInclude(new Uri("avares://Avalonia.SpellChecker/"))
@@ -57,6 +80,23 @@ namespace Avalonia.SpellChecker
             textBox.AddHandler(Control.ContextRequestedEvent, TextBox_ContextRequested, handledEventsToo: true);
         }
 
+        public void Enable(TextBox textBox)
+        {
+            if (!controls.Contains(textBox))
+            {
+                Initialize(textBox);
+            }
+
+            disabledControls.Remove(textBox);
+            SetPresenterEnabled(textBox, IsEnabled);
+        }
+
+        public void Disable(TextBox textBox)
+        {
+            disabledControls.Add(textBox);
+            SetPresenterEnabled(textBox, false);
+        }
+
         private void OnTemplateApplied(object? sender, Controls.Primitives.TemplateAppliedEventArgs e)
         {
             var textPresenter = e.NameScope.Find<SpellCheckerTextPresenter>("PART_TextPresenter");
@@ -66,12 +106,15 @@ namespace Avalonia.SpellChecker
                 return;
             }
 
-            textPresenter.SpellChecker = new SpellChecker(config);
+            var spellChecker = new SpellChecker(config);
 
             if (sender is TextBox textBox)
             {
                 textBox.TemplateApplied -= OnTemplateApplied;
+                spellChecker.IsEnabled = (IsEnabled && !disabledControls.Contains(textBox));
             }
+
+            textPresenter.SpellChecker = spellChecker;
         }
 
 
@@ -94,6 +137,11 @@ namespace Avalonia.SpellChecker
         {
 
             if (sender is not TextBox textBox)
+            {
+                return;
+            }
+
+            if (!IsEnabled || disabledControls.Contains(textBox))
             {
                 return;
             }
@@ -195,6 +243,18 @@ namespace Avalonia.SpellChecker
                 .Insert(suggestion.OriginalWordPosition, suggestion.WordSuggested);
         }
 
+        private void SetPresenterEnabled(TextBox textBox, bool enabled)
+        {
+            var textPresenter = textBox.GetVisualDescendants().OfType<Avalonia.SpellChecker.SpellCheckerTextPresenter>().FirstOrDefault();
+
+            if (textPresenter is null)
+            {
+                return;
+            }
+
+            textPresenter.SpellChecker.IsEnabled = enabled;
+            textPresenter.ForceInvalidateTextLayout();
+        }
 
     }
     // Custom ICommand implementation
