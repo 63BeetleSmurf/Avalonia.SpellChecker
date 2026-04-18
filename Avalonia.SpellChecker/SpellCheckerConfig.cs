@@ -1,6 +1,4 @@
-﻿using System.Reflection;
-
-namespace Avalonia.SpellChecker
+﻿namespace Avalonia.SpellChecker
 {
     /// <summary>
     /// SpellChecker settings
@@ -16,7 +14,7 @@ namespace Avalonia.SpellChecker
         {
             var config = new SpellCheckerConfig
             {
-                DictionariesFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Dictionaries")
+                DictionariesFolder = Path.Combine(AppContext.BaseDirectory, "Dictionaries")
             };
 
             config.EnabledLanguages.AddRange(languages);
