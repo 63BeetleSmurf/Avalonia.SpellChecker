@@ -1,4 +1,5 @@
 ﻿using Avalonia.Collections;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Presenters;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
@@ -36,9 +37,11 @@ public class SpellCheckerTextPresenter : TextPresenter
         {
             Location = TextDecorationLocation.Underline,
             Stroke = Brushes.OrangeRed,
-            StrokeDashArray = new AvaloniaList<double>(new[] { 1, 2.0 }),
-            StrokeLineCap = PenLineCap.Round,
-            StrokeThickness = 22.5
+            StrokeDashArray = new AvaloniaList<double>(new[] { 1.0, 1.0 }),
+            StrokeThickness = 0.1,
+            StrokeThicknessUnit = TextDecorationUnit.FontRenderingEmSize,
+            StrokeOffset = 0.05,
+            StrokeOffsetUnit = TextDecorationUnit.FontRenderingEmSize
         };
 
         _overridesCacheSpellChecking = new List<ValueSpan<TextRunProperties>>();
@@ -179,6 +182,21 @@ public class SpellCheckerTextPresenter : TextPresenter
         }
 
         return result;
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (
+            change.Property == TextElement.ForegroundProperty
+            || change.Property == TextElement.FontSizeProperty
+            || change.Property == TextElement.FontFamilyProperty
+            || change.Property == TextElement.FontWeightProperty
+        )
+        {
+            ForceInvalidateTextLayout();
+        }
     }
 
     public IEnumerable<SpellCheckSuggestion>? GetSuggestionsAt(Point point, out string? mispelledWord)
