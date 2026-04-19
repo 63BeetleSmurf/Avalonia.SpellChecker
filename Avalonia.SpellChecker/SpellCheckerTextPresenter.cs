@@ -36,9 +36,11 @@ public class SpellCheckerTextPresenter : TextPresenter
         {
             Location = TextDecorationLocation.Underline,
             Stroke = Brushes.OrangeRed,
-            StrokeDashArray = new AvaloniaList<double>(new[] { 1, 2.0 }),
-            StrokeLineCap = PenLineCap.Round,
-            StrokeThickness = 22.5
+            StrokeDashArray = new AvaloniaList<double>(new[] { 1.0, 1.0 }),
+            StrokeThickness = 0.1,
+            StrokeThicknessUnit = TextDecorationUnit.FontRenderingEmSize,
+            StrokeOffset = 0.05,
+            StrokeOffsetUnit = TextDecorationUnit.FontRenderingEmSize
         };
 
         _overridesCacheSpellChecking = new List<ValueSpan<TextRunProperties>>();
