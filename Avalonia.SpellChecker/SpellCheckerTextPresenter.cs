@@ -1,4 +1,5 @@
 ﻿using Avalonia.Collections;
+using Avalonia.Controls.Documents;
 using Avalonia.Controls.Presenters;
 using Avalonia.Media;
 using Avalonia.Media.TextFormatting;
@@ -174,6 +175,21 @@ public class SpellCheckerTextPresenter : TextPresenter
         }
 
         return result;
+    }
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+
+        if (
+            change.Property == TextElement.ForegroundProperty
+            || change.Property == TextElement.FontSizeProperty
+            || change.Property == TextElement.FontFamilyProperty
+            || change.Property == TextElement.FontWeightProperty
+        )
+        {
+            ForceInvalidateTextLayout();
+        }
     }
 
     public IEnumerable<SpellCheckSuggestion>? GetSuggestionsAt(Point point, out string? mispelledWord)
