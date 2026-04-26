@@ -9,6 +9,8 @@ namespace Avalonia.SpellChecker
         /// </summary>
         private static DictionaryManager? dictionaryManager;
 
+        public bool IsEnabled { get; set; } = true;
+
         public SpellChecker(SpellCheckerConfig spellCheckerConfig)
         {
             //_wordList = WordList.CreateFromFiles(dictionaryPath);

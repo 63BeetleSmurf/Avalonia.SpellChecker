@@ -110,11 +110,12 @@ public class SpellCheckerTextPresenter : TextPresenter
                 // Reuses the overridesCacheSpellChecking list to avoid creating a new list every time
                 overrides.Clear();
 
+                if (_spellChecker.IsEnabled)
+                {
+                    var misspellesWordTextDecorations = new TextDecorationCollection();
+                    misspellesWordTextDecorations.Add(MisspelledWordDecoration);
 
-                var misspellesWordTextDecorations = new TextDecorationCollection();
-                misspellesWordTextDecorations.Add(MisspelledWordDecoration);
-
-                _spellCheckResults = _spellChecker.CheckSpellingFullText(Text);
+                    _spellCheckResults = _spellChecker.CheckSpellingFullText(Text);
 
                 var underlineProp = new GenericTextRunProperties(
                                         typeface,
@@ -123,28 +124,30 @@ public class SpellCheckerTextPresenter : TextPresenter
                                         textDecorations: misspellesWordTextDecorations,
                                         foregroundBrush: foreground);
 
-                int currentPosition = 0;
+                    int currentPosition = 0;
 
 
-                foreach (var word in _spellCheckResults)
-                {
-                    // If there is a gap between currentPosition and the start of the misspelled word
-                    if (word.Start > currentPosition)
+                    foreach (var word in _spellCheckResults)
                     {
-                        // Add a ValueSpan with the default decoration for the gap
-                        overrides.Add(new ValueSpan<TextRunProperties>(currentPosition, word.Start - currentPosition, defaultTextRunProperties));
+                        // If there is a gap between currentPosition and the start of the misspelled word
+                        if (word.Start > currentPosition)
+                        {
+                            // Add a ValueSpan with the default decoration for the gap
+                            overrides.Add(new ValueSpan<TextRunProperties>(currentPosition, word.Start - currentPosition, defaultTextRunProperties));
+                        }
+
+                        overrides.Add(new ValueSpan<TextRunProperties>(word.Start, word.Length, underlineProp));
+
+                        currentPosition = word.Start + word.Length;
                     }
 
-                    overrides.Add(new ValueSpan<TextRunProperties>(word.Start, word.Length, underlineProp));
-
-                    currentPosition = word.Start + word.Length;
+                    // If there is any text left after the last misspelled word, add a default decoration
+                    if (currentPosition < Text.Length)
+                    {
+                        overrides.Add(new ValueSpan<TextRunProperties>(currentPosition, Text.Length - currentPosition, defaultTextRunProperties));
+                    }
                 }
 
-                // If there is any text left after the last misspelled word, add a default decoration
-                if (currentPosition < Text.Length)
-                {
-                    overrides.Add(new ValueSpan<TextRunProperties>(currentPosition, Text.Length - currentPosition, defaultTextRunProperties));
-                }
                 _overridesCacheKey = Text;
                 //Debug.Print($"Added to cache {Text}");
             }

@@ -2,13 +2,13 @@
 {
     /// <summary>
     /// SpellChecker settings
-    /// TODO: Enable/Disable spell checking
     /// </summary>
     public class SpellCheckerConfig
     {
         public string DictionariesFolder { get; set; } = "Dictionaries";
         public string? CustomDictionariesFolder { get; set; } = null;
         public List<string> EnabledLanguages { get; set; } = new List<string>();
+        public bool IsEnabled { get; set; } = true;
 
         public static SpellCheckerConfig Create(params string[] languages)
         {
