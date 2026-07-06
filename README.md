@@ -1,133 +1,148 @@
+# Avalonia Spell Checker
 
-# Avalonia Spell Checker for TextBox
+[![NuGet](https://img.shields.io/nuget/v/GHSoftware.Avalonia.SpellChecker.svg)](https://www.nuget.org/packages/GHSoftware.Avalonia.SpellChecker)
+[![NuGet Avalonia 11](https://img.shields.io/nuget/v/GHSoftware.Avalonia.SpellChecker.Avalonia11.svg)](https://www.nuget.org/packages/GHSoftware.Avalonia.SpellChecker.Avalonia11)
 
-
-Avalonia Spell Checker adds real-time spell-checking to Avalonia TextBox controls without replacing or changing their behavior. It uses the WeCantSpell.Hunspell library for spell-checking and allows you to manage custom dictionaries. The extension integrates with existing TextBox elements and provides suggestions for misspelled words through a context menu.
-
+Avalonia Spell Checker adds Hunspell-based spell checking to Avalonia `TextBox` controls. It highlights misspelled words while the user types and adds spelling suggestions to the existing context menu without requiring a custom text input control.
 
 <p float="left">
-   
-![Demonstration screenshot](avalonia-spell-checker-demo3.gif)
-![Ignore demonstration screenshot](avalonia-spell-checker-ignore-demo.gif)
-![Demonstration screenshot](demo-screenshot-mac.png)
+
+![Spell checker demonstration](avalonia-spell-checker-demo3.gif)
+![Ignore word demonstration](avalonia-spell-checker-ignore-demo.gif)
+![macOS screenshot](demo-screenshot-mac.png)
 
 </p>
 
 ## Features
 
-- **Real-time Spell Checking**: Misspelled words are highlighted as the user types.
-- **Custom Dictionaries**: Add (or manage WIP) custom words for specific languages. 
-- **Context Menu Integration**: Provides suggestions for misspelled words in a context menu.
-- **Customization**: Developers can modify styles for underlining and other text decorations for incorrect words.
-- **Works with native Avalonia TextBox**: The library is minimally intrusive, integrating seamlessly with text control.
-- **Support for Multiple Languages**: Allows the use of different language dictionaries simultaneously.
+- Real-time spell checking for Avalonia `TextBox`.
+- Hunspell `.aff` and `.dic` dictionary support through `WeCantSpell.Hunspell`.
+- Multiple enabled languages at the same time.
+- Context menu suggestions for misspelled words.
+- Custom ignored words.
+- Automatic style registration when `TextBoxSpellChecker.Initialize` is called.
+- Included dictionaries for `en_GB`, `es_MX`, and `pt_BR`.
 
+## NuGet Packages
 
-## Getting Started
+Use the package that matches your Avalonia major version:
 
-### Prerequisites
+| Avalonia version | Package | Target frameworks |
+| --- | --- | --- |
+| Avalonia 12.x | [`GHSoftware.Avalonia.SpellChecker`](https://www.nuget.org/packages/GHSoftware.Avalonia.SpellChecker) | `net8.0`, `net10.0` |
+| Avalonia 11.1+ | [`GHSoftware.Avalonia.SpellChecker.Avalonia11`](https://www.nuget.org/packages/GHSoftware.Avalonia.SpellChecker.Avalonia11) | `net6.0`, `net8.0`, `net10.0` |
 
-- [.NET 6 or higher](https://dotnet.microsoft.com/download) < Needs to be confirmed
-- [AvaloniaUI](https://avaloniaui.net/)
-- [WeCantSpell.Hunspell](https://github.com/WeCantSpell/Hunspell)
+Install the current Avalonia package:
 
-### Installation
+```bash
+dotnet add package GHSoftware.Avalonia.SpellChecker
+```
 
+Install the Avalonia 11 package:
 
-1. Clone this repository (there is also a Nuget package):
-   ```bash
-   git clone https://github.com/GustavoHennig/Avalonia.SpellChecker.git
-   ```
+```bash
+dotnet add package GHSoftware.Avalonia.SpellChecker.Avalonia11
+```
 
-2. Install the required packages:
-   ```bash
-   dotnet restore
-   ```
+The two packages expose the same `Avalonia.SpellChecker` namespace and API. The separate package IDs keep NuGet dependency resolution explicit and avoid mixing Avalonia 11 and Avalonia 12 assets in the same package.
 
-3. Ensure the dictionary files (.aff and .dic) are placed in the `Dictionaries` folder, as specified in `SpellCheckerConfig`.
+## Usage
 
-### Usage
-
-To enable spell checking for a `TextBox` control, initialize `TextBoxSpellChecker` with the required configuration:
-
+Create a `TextBoxSpellChecker` and initialize each `TextBox` that should be checked:
 
 ```csharp
+using Avalonia.Controls;
+using Avalonia.SpellChecker;
+
 public partial class MainWindow : Window
 {
-    private readonly TextBoxSpellChecker textBoxSpellChecker;
+    private readonly TextBoxSpellChecker _spellChecker;
 
     public MainWindow()
     {
         InitializeComponent();
 
-        // Initialize the spell checker
-        // * default dictionaries directory is Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "Dictionaries"))
-        textBoxSpellChecker = new TextBoxSpellChecker(SpellCheckerConfig.Create("pt_BR", "en_GB"));
+        _spellChecker = new TextBoxSpellChecker(
+            SpellCheckerConfig.Create("pt_BR", "en_GB"));
 
-        var textBox = this.FindControl<TextBox>("tbDescription");
-        textBoxSpellChecker.Initialize(textBox);
+        var textBox = this.FindControl<TextBox>("DescriptionTextBox");
+        if (textBox is not null)
+        {
+            _spellChecker.Initialize(textBox);
+        }
     }
 }
 ```
 
-The `TextBoxSpellChecker` automatically begins spell-checking the `TextBox` control. Misspelled words are underlined, and suggestions are provided in a context menu when the user right-clicks on the word.   
-When the `TextBox` control is detached from the view, the spell checker automatically removes its event handlers, and the reference to the `TextBox` is cleared.
+By default, `SpellCheckerConfig.Create(...)` looks for dictionaries in:
 
+```text
+<application output directory>/Dictionaries
+```
 
-## Dictionary Files
+The NuGet packages include the bundled dictionaries as content files and copy them to the output directory automatically.
 
+After `Initialize` is called, the `TextBoxSpellChecker` starts checking the target `TextBox` as soon as its template is applied. Misspelled words are underlined, and suggestions are added to the context menu when the user right-clicks a misspelled word.
 
-According to ChatGPT, these are the most reliable and updated sources for downloading Hunspell dictionary files (ok, it seems that the first one is the easiest choice):
+When the `TextBox` is detached from the logical tree, the spell checker removes its event handlers and clears its reference to that control.
 
+## Dictionaries
 
-1. **LibreOffice Dictionaries Repository**:
-   The LibreOffice project maintains updated Hunspell dictionaries for a variety of languages. You can find them here:
-   - [LibreOffice Dictionaries on GitHub](https://github.com/LibreOffice/dictionaries)
-   
-   This is one of the best places to find dictionaries that are actively maintained and used by large communities.
+Hunspell dictionaries use a pair of files per language:
 
-2. **Mozilla Add-ons**:
-   Mozilla also uses Hunspell dictionaries for spell checking in Firefox, and they maintain a large collection of dictionaries available for download:
-   - [Mozilla Add-ons: Dictionaries](https://addons.mozilla.org/en-US/firefox/language-tools/)
+```text
+<language>.aff
+<language>.dic
+```
 
-3. **Apache OpenOffice**:
-   OpenOffice also provides Hunspell-compatible dictionaries that you can download:
-   - [Apache OpenOffice Dictionaries](https://extensions.openoffice.org/en/search?f%5B0%5D=field_project_tags%3A157)
+For example:
 
-4. **Hunspell Dictionaries Collection**:
-   ~~The Hunspell project itself hosts a repository of dictionaries:~~
-   ~~- [Hunspell Dictionaries on GitHub](https://github.com/hunspell/hunspell/tree/master/dictionaries)~~ 404
+```text
+Dictionaries/pt_BR.aff
+Dictionaries/pt_BR.dic
+```
 
-These sources are widely trusted and offer dictionaries that are kept up-to-date by large communities and projects.
+The bundled dictionaries are enough to start using the library. To add or replace dictionaries, use Hunspell-compatible files from maintained dictionary projects such as:
 
+- [LibreOffice dictionaries](https://github.com/LibreOffice/dictionaries)
+- [Mozilla dictionaries](https://addons.mozilla.org/firefox/language-tools/)
+- [Apache OpenOffice dictionaries](https://extensions.openoffice.org/)
 
+Then configure the folder explicitly if needed:
 
-## Known Issues
+```csharp
+var config = SpellCheckerConfig.Create("en_GB");
+config.DictionariesFolder = @"C:\path\to\Dictionaries";
+```
 
+## Building Packages
 
-- Works only with Fluent theme
-- Keyboard context menu is not showing the suggestions
-- Only tested on Windows
+The repository builds two NuGet packages: one for Avalonia 12 and one for Avalonia 11.
 
+```powershell
+.\scripts\pack-all.ps1 -Configuration Release -Clean
+```
 
+To override the package version:
 
-## Customization
+```powershell
+.\scripts\pack-all.ps1 -Configuration Release -Version 0.3.1 -Clean
+```
 
-You can customize the behavior and appearance of the spell checker by modifying:
+Packages are written to:
 
-- **Text Styles**: Define how misspelled words are underlined or styled in `SpellCheckerTextPresenter.cs`. (WIP)
-- **Custom Dictionaries**: Add or remove custom words for specific languages through `DictionaryManager.cs`.
+```text
+artifacts/nuget
+```
 
-## TODO
+## Current Limitations
 
-- [X] Implement custom word management (add/remove custom words).
-- [ ] Allow dynamic enabling/disabling of spell checking.
-- [ ] Improve performance for larger text inputs.
-- [X] Include dictionary files for multiple languages.
+- Keyboard-triggered context menus do not currently show spelling suggestions because suggestions are resolved from a pointer position.
+- The included dictionaries are limited to `en_GB`, `es_MX`, and `pt_BR`.
 
 ## Contributing
 
-Feel free to contribute by submitting pull requests, reporting issues, or suggesting features.
+Issues and pull requests are welcome.
 
 ## License
 
