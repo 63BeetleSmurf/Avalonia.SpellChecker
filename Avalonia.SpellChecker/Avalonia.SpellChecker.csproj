@@ -3,7 +3,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<Version>0.3.2</Version>
+		<Version>0.3.3</Version>
 		<Authors>Gustavo Augusto Hennig</Authors>
 		<Company>GH Software Ltda</Company>
 		<Description>A spell-checking extension for Avalonia TextBox using WeCantSpell.Hunspell.</Description>
@@ -47,9 +47,13 @@
 		<Content Include="Dictionaries\*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<Pack>true</Pack>
-			<PackagePath>contentFiles\any\any\Dictionaries\</PackagePath>
-			<PackageCopyToOutput>true</PackageCopyToOutput>
+			<PackagePath>buildTransitive\Dictionaries\%(Filename)%(Extension)</PackagePath>
 		</Content>
+
+		<None Include="Avalonia.SpellChecker.targets">
+			<Pack>true</Pack>
+			<PackagePath>buildTransitive\$(PackageId).targets</PackagePath>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
