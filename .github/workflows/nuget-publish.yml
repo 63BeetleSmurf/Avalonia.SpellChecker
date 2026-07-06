@@ -26,6 +26,18 @@ jobs:
       run: |
         $version = "${{ github.ref_name }}".TrimStart("v")
         ./scripts/pack-all.ps1 -Configuration Release -Version $version -Clean
+        Get-ChildItem artifacts/nuget | Format-Table Name, Length
+
+        $packages = @(
+          "artifacts/nuget/GHSoftware.Avalonia.SpellChecker.$version.nupkg",
+          "artifacts/nuget/GHSoftware.Avalonia.SpellChecker.Avalonia11.$version.nupkg"
+        )
+
+        foreach ($package in $packages) {
+          if (-not (Test-Path $package)) {
+            throw "Expected package was not created: $package"
+          }
+        }
 
     - name: NuGet login
       uses: NuGet/login@v1
@@ -34,7 +46,15 @@ jobs:
         user: ${{ vars.NUGET_USER }}
       
     - name: Publish to NuGet
+      shell: pwsh
       run: |
-        for package in artifacts/nuget/*.nupkg; do
-          dotnet nuget push "$package" --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
-        done
+        $version = "${{ github.ref_name }}".TrimStart("v")
+        $packages = @(
+          "artifacts/nuget/GHSoftware.Avalonia.SpellChecker.$version.nupkg",
+          "artifacts/nuget/GHSoftware.Avalonia.SpellChecker.Avalonia11.$version.nupkg"
+        )
+
+        foreach ($package in $packages) {
+          Write-Host "Publishing $package"
+          dotnet nuget push $package --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
+        }

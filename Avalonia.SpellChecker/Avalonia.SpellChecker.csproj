@@ -3,7 +3,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-		<Version>0.3.1</Version>
+		<Version>0.3.2</Version>
 		<Authors>Gustavo Augusto Hennig</Authors>
 		<Company>GH Software Ltda</Company>
 		<Description>A spell-checking extension for Avalonia TextBox using WeCantSpell.Hunspell.</Description>
@@ -11,7 +11,7 @@
 		<RepositoryUrl>https://github.com/GustavoHennig/Avalonia.SpellChecker</RepositoryUrl>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<RepositoryType>git</RepositoryType>
-		<Copyright>© 2024 Gustavo Augusto Hennig</Copyright>
+		<Copyright>© 2024-2026 Gustavo Hennig</Copyright>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<!-- Default to latest version -->
