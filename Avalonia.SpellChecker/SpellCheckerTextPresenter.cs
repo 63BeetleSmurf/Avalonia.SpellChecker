@@ -110,7 +110,7 @@ public class SpellCheckerTextPresenter : TextPresenter
                 // Reuses the overridesCacheSpellChecking list to avoid creating a new list every time
                 overrides.Clear();
 
-                if (_spellChecker.IsEnabled)
+                if (_spellChecker?.IsEnabled == true)
                 {
                     var misspellesWordTextDecorations = new TextDecorationCollection();
                     misspellesWordTextDecorations.Add(MisspelledWordDecoration);
