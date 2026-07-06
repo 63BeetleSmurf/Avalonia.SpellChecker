@@ -8,6 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     
     steps:
     - name: Checkout code
@@ -23,6 +26,12 @@ jobs:
       run: |
         $version = "${{ github.ref_name }}".TrimStart("v")
         ./scripts/pack-all.ps1 -Configuration Release -Version $version -Clean
+
+    - name: NuGet login
+      uses: NuGet/login@v1
+      id: nuget-login
+      with:
+        user: ${{ vars.NUGET_USER }}
       
     - name: Publish to NuGet
-      run: dotnet nuget push "artifacts/nuget/*.*nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_API_KEY }} --skip-duplicate
+      run: dotnet nuget push "artifacts/nuget/*.*nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
