@@ -1,5 +1,6 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
+using Avalonia.LogicalTree;
 using Avalonia.Markup.Xaml.MarkupExtensions;
 using Avalonia.Markup.Xaml.Styling;
 using Avalonia.Media;
@@ -21,6 +22,8 @@ namespace Avalonia.SpellChecker
     /// </summary>
     public class TextBoxSpellChecker
     {
+        private static bool s_stylesLoaded;
+
         private readonly HashSet<TextBox> controls = new HashSet<TextBox>();
         private readonly HashSet<TextBox> disabledControls = new HashSet<TextBox>();
         private readonly SpellCheckerConfig config;
@@ -68,14 +71,7 @@ namespace Avalonia.SpellChecker
             if (!isEnabled)
                 disabledControls.Add(textBox);
 
-            // Create a new StyleInclude instance
-            var styleInclude = new StyleInclude(new Uri("avares://Avalonia.SpellChecker/"))
-            {
-                Source = new Uri("avares://Avalonia.SpellChecker/Styles/SpellCheckerStyles.axaml")
-            };
-
-            // Add the style to the Window's Styles collection
-            textBox.Styles.Add(styleInclude);
+            EnsureStylesLoaded(textBox);
 
             // Initialize the SpellCheckerTextPresenter setting
             textBox.TemplateApplied += OnTemplateApplied;
@@ -84,6 +80,37 @@ namespace Avalonia.SpellChecker
             textBox.DetachedFromLogicalTree += OnTextBoxDisposed;
 
             textBox.AddHandler(Control.ContextRequestedEvent, TextBox_ContextRequested, handledEventsToo: true);
+        }
+
+        private static void EnsureStylesLoaded(TextBox textBox)
+        {
+            if (s_stylesLoaded)
+            {
+                return;
+            }
+
+            var appStyles = Application.Current?.Styles;
+            if (appStyles is null)
+            {
+                textBox.AttachedToLogicalTree += OnTextBoxAttachedToLogicalTree;
+                return;
+            }
+
+            appStyles.Add(new StyleInclude(new Uri("avares://Avalonia.SpellChecker/"))
+            {
+                Source = new Uri("avares://Avalonia.SpellChecker/Styles/SpellCheckerStyles.axaml")
+            });
+
+            s_stylesLoaded = true;
+        }
+
+        private static void OnTextBoxAttachedToLogicalTree(object? sender, LogicalTreeAttachmentEventArgs e)
+        {
+            if (sender is TextBox textBox)
+            {
+                textBox.AttachedToLogicalTree -= OnTextBoxAttachedToLogicalTree;
+                EnsureStylesLoaded(textBox);
+            }
         }
 
         public void Enable(TextBox textBox)

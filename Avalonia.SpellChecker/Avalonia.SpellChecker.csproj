@@ -2,9 +2,8 @@
 	<PropertyGroup>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-		<PackageId>GHSoftware.Avalonia.SpellChecker</PackageId>
-		<Version>0.3.0</Version>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+		<Version>0.3.1</Version>
 		<Authors>Gustavo Augusto Hennig</Authors>
 		<Company>GH Software Ltda</Company>
 		<Description>A spell-checking extension for Avalonia TextBox using WeCantSpell.Hunspell.</Description>
@@ -20,15 +19,15 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(AvaloniaVersion)' == '11'">
-		<TargetFrameworks>net6.0;net8.0</TargetFrameworks>
+		<TargetFrameworks>net6.0;net8.0;net10.0</TargetFrameworks>
 		<DefineConstants>AVALONIA_11</DefineConstants>
-		<PackageVersion>$(Version)-avalonia11</PackageVersion>
+		<PackageId>GHSoftware.Avalonia.SpellChecker.Avalonia11</PackageId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(AvaloniaVersion)' == '12'">
 		<TargetFrameworks>net8.0;net10.0</TargetFrameworks>
 		<DefineConstants>AVALONIA_12</DefineConstants>
-		<PackageVersion>$(Version)-avalonia12</PackageVersion>
+		<PackageId>GHSoftware.Avalonia.SpellChecker</PackageId>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -45,23 +44,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Content Include="Dictionaries\en_GB.aff">
+		<Content Include="Dictionaries\*.*">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Dictionaries\en_GB.dic">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Dictionaries\es_MX.aff">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Dictionaries\es_MX.dic">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Dictionaries\pt_BR.aff">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</Content>
-		<Content Include="Dictionaries\pt_BR.dic">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<Pack>true</Pack>
+			<PackagePath>contentFiles\any\any\Dictionaries\</PackagePath>
+			<PackageCopyToOutput>true</PackageCopyToOutput>
 		</Content>
 	</ItemGroup>
 
@@ -81,10 +68,10 @@
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(AvaloniaVersion)' == '11'">
-		<PackageReference Include="Avalonia" Version="11.*" />
+		<PackageReference Include="Avalonia" Version="[11.1.0,12.0.0)" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(AvaloniaVersion)' == '12'">
-		<PackageReference Include="Avalonia" Version="12.*" />
+		<PackageReference Include="Avalonia" Version="[12.0.0,13.0.0)" />
 	</ItemGroup>
 </Project>
